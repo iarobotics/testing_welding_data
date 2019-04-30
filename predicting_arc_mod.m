@@ -33,7 +33,7 @@ xi1 = all_voltages(1:10, 1:2);
 threshold = 0.8;
 y_thresh = y1;
 y_thresh(y1 < threshold) = 0;
-y_thresh(y1 > threshold) = 0.9;
+y_thresh(y1 > threshold) = 1;
 
 %plot network output against actual arc for the data used for training
 figure(1)
@@ -52,7 +52,7 @@ xi1_test = current_voltage4(1:10, 1:2);
 % Threshold the NN y output
 y_thresh_new = y_new;
 y_thresh_new(y_new < threshold) = 0;
-y_thresh_new(y_new > threshold) = 0.9;
+y_thresh_new(y_new > threshold) = 1;
 
 %plot network output against actual arc
 figure(2)
@@ -61,5 +61,24 @@ plot(1:length(y_new),arc4,1:length(y_new),y_thresh_new),
 title('Predicted against actual short circuit - Testing'),
 grid on
 
- 
- 
+
+%% Save variables to file
+threshold = 0.4;
+y_thresh = y1;
+y_thresh(y1 < threshold) = 0;
+y_thresh(y1 > threshold) = 1;
+
+y_thresh_new = y_new;
+y_thresh_new(y_new < threshold) = 0;
+y_thresh_new(y_new > threshold) = 1;
+
+ys = y1';
+save('C:\Users\Ion Sircu\Desktop\temp\y1.txt', 'ys', '-ASCII')
+ys = y_thresh';
+save('C:\Users\Ion Sircu\Desktop\temp\y_t.txt', 'ys', '-ASCII')
+ys = y_new';
+save('C:\Users\Ion Sircu\Desktop\temp\y_new.txt', 'ys', '-ASCII')
+ys = y_thresh_new';
+save('C:\Users\Ion Sircu\Desktop\temp\y_new_t.txt', 'ys', '-ASCII')
+save('C:\Users\Ion Sircu\Desktop\temp\all_arcs.txt', 'all_arcs', '-ASCII')
+save('C:\Users\Ion Sircu\Desktop\temp\arc4.txt', 'arc4', '-ASCII')
