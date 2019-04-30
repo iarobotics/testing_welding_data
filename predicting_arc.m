@@ -37,7 +37,7 @@ xi2 = all_arcs(1:10);
 [y1,xf1] = myNeuralNetworkFunction_io(all_voltages.',xi1.');
 
 %plot network output against actual arc
-figure(12)
+figure(11)
 plot(1:length(y1),all_arcs,1:length(y1),y1)
 
 
