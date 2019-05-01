@@ -34,11 +34,11 @@ all_arcs=cell2mat(all_arcs);
 xi1 = all_voltages(1:10, 1:2);
 xi2 = all_arcs(1:10);
 
-[y1,xf1] = myNeuralNetworkFunction_io(all_voltages.',xi1.');
+%[y1,xf1] = myNeuralNetworkFunction_io(all_voltages.',xi1.');
 
 %plot network output against actual arc
-figure(11)
-plot(1:length(y1),all_arcs,1:length(y1),y1)
+%figure(11)
+%plot(1:length(y1),all_arcs,1:length(y1),y1)
 
 
 %testing the network on new data
@@ -53,8 +53,8 @@ xi2_test = arc4(1:10);
 [y_new,xf1_new] = myNeuralNetworkFunction_io(current_voltage4.',xi1_test.');
 
 %plot network output against actual arc
-figure(12)
-plot(1:length(y_new),arc4,1:length(y_new),y_new)
+%figure(12)
+%plot(1:length(y_new),arc4,1:length(y_new),y_new)
 
 
 %save('current.mat','current', 'current2');
