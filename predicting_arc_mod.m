@@ -32,10 +32,10 @@ xi1 = all_voltages(1:20, 1:2);
 [y1,xf1] = myNeuralNetworkFunction_10n_20d(all_voltages.',xi1.');
 
 % Threshold the NN y output
-%threshold = 0.8;
-%y_thresh = y1;
-%y_thresh(y1 < threshold) = 0;
-%y_thresh(y1 > threshold) = 1;
+threshold = 0.65;
+y_thresh = y1;
+y_thresh(y1 < threshold) = 0;
+y_thresh(y1 > threshold) = 0.95;
 
 %plot network output against actual arc for the data used for training
 figure(1)
@@ -53,14 +53,14 @@ xi1_test = current_voltage4(1:10, 1:2);
 [y_new,xf1_new] = myNeuralNetworkFunction_10n_20d(current_voltage4.',xi1_test.');
 
 % Threshold the NN y output
-%y_thresh_new = y_new;
-%y_thresh_new(y_new < threshold) = 0;
-%y_thresh_new(y_new > threshold) = 1;
+y_thresh_new = y_new;
+y_thresh_new(y_new < threshold) = 0;
+y_thresh_new(y_new > threshold) = 0.95;
 
 %plot network output against actual arc
 figure(2)
 %plot(1:length(y_new),arc4,1:length(y_new),y_new),
-plot(1:length(y_new),arc4,1:length(y_new),y_new),
+plot(1:length(y_new),arc4,1:length(y_new),y_thresh_new),
 title('Predicted against actual short circuit - Testing'),
 grid on
 
@@ -73,7 +73,7 @@ y_thresh(y1 > threshold) = 1;
 
 y_thresh_new = y_new;
 y_thresh_new(y_new < threshold) = 0;
-y_thresh_new(y_new > threshold) = 1;
+y_thresh_new(y_new > threshold) = 0.95;
 
 ys = y1';
 save('C:\Users\Ion Sircu\Desktop\temp\y1.txt', 'ys', '-ASCII')
