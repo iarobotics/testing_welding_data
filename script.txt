@@ -1,0 +1,15 @@
+import pandas as pd
+
+headers = ['arc']
+
+y_t = pd.read_csv('/media/sf_Downloads/temp/y_t.txt', names=headers)
+arc4 = pd.read_csv('/media/sf_Downloads/temp/arc4.txt', names=headers)
+
+y_t = y_t.arc
+arc4 = arc4.arc
+
+from sklearn.metrics import confusion_matrix
+y_actu = [2, 0, 2, 2, 0, 1, 1, 2, 2, 0, 1, 2]
+y_pred = [0, 0, 2, 1, 0, 2, 1, 0, 2, 0, 2, 2]
+#confusion_matrix(y_actu, y_pred)
+print(confusion_matrix(arc4, y_t))

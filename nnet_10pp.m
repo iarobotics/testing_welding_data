@@ -28,7 +28,7 @@ all_arcs_10pp = [arc; arc2; arc3];
 xi1_10pp = current_voltage4(1:10, 1:2);
 %xi1_10pp = all_voltages(1:20, 1:2);
 
-[y_new,xf1_new] = nn_d2n10(current_voltage4.',xi1_10pp.');
+[y_new,xf1_new] = nn_d4n10(current_voltage4.',xi1_10pp.');
 
 %% Save variables to file
 threshold = 0.65;
