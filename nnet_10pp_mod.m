@@ -33,19 +33,19 @@ all_arcs_10pp = [arc; arc2; arc3];
 xi1_10pp = current_voltage4(1:10, 1:2);
 %xi1_10pp = all_voltages(1:20, 1:2);
 
-[y_new,xf1_new] = nn_d10_n16(current_voltage4.',xi1_10pp.');
+[y_new,xf1_new] = nn_d10n10(current_voltage4.',xi1_10pp.');
 
 %% Save variables to file
-threshold = 0.65;
+threshold = 0.75;
 y_thresh = y_new;
 y_thresh(y_new < threshold) = 0;
-y_thresh(y_new > threshold) = 0.9;
+y_thresh(y_new > threshold) = 1;
 
-figure(1)
+%figure(1)
 %plot(1:length(y1),all_arcs,1:length(y1),y1),
-plot(1:length(y_thresh)+2,arc_full,1:length(y_thresh),y_thresh),
-title('Predicted against actual short circuit - Training'),
-grid on
+%plot(1:length(y_thresh)+2,arc_full,1:length(y_thresh),y_thresh),
+%title('Predicted against actual short circuit - Training'),
+%grid on
 
 % save thresholded output
 ys = y_thresh';
