@@ -3,10 +3,8 @@ clear all
 clc
 
 % Add path (at beginning of script)
-narx = [pwd,'/narx']; %change to: added_path = '/path' for your required path
-functions = [pwd,'/nn_function1']; %change to: added_path = '/path' for your required path
-addpath(narx);
-addpath(functions);
+added_path = [pwd,'/functions']; %change to: added_path = '/path' for your required path
+addpath(added_path);
 
 %this script is predicting the rupture period
 log_start = 0.5e5-2;
@@ -84,5 +82,4 @@ save('script\y_pred.txt', 'ys', '-ASCII')
 save('script\y.txt', 'arc_4', '-ASCII')
 
 % Remove path (at end of script/script clean-up)
-rmpath(narx);
-rmpath(functions);
+rmpath(added_path);
