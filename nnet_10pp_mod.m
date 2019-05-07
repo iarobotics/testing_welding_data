@@ -51,6 +51,7 @@ train_input = [current_voltage_1; current_voltage_2; current_voltage_3];
 %train_input = [cvs_1; cvs_2; cvs_3];
 %train_target = [rupture_r1; rupture_r2; rupture_r3];
 train_target = [voltage_1;voltage_2;voltage_3];
+%train_target = [arc_1;arc_2;arc_3];
 
 % New data for testing the model
 log_r4 = importdata('data\data_4_cut_first_90p.txt');
