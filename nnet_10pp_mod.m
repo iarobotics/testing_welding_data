@@ -55,17 +55,47 @@ train_target = [voltage_1;voltage_2;voltage_3];
 % New data for testing the model
 log_r4 = importdata('data\data_4_cut_first_90p.txt');
 test_input = cvs_4;
-test_target = log_r4(:,3);
+test_target = log_r4(:,2);
 
 clearvars -except train_input train_target test_input test_target arc_4 added_path
 
 
 %% Generate prediction y_new
-%delay 
-xi1_10pp = test_input(1:10, 1:3);
+% [y1,xf1,xf2] = myNeuralNetworkFunction(x1,x2,xi1,xi2) takes these arguments:
+%   x1 = 2xTS matrix, input #1
+%   x2 = 1xTS matrix, input #2
+%   xi1 = 2x10 matrix, initial 10 delay states for input #1.
+%   xi2 = 1x10 matrix, initial 10 delay states for input #2.
+% and returns:
+%   y1 = 1xTS matrix, output #1
+%   xf1 = 2x10 matrix, final 10 delay states for input #1.
+%   xf2 = 1x10 matrix, final 10 delay states for input #2.
+% where TS is the number of timesteps.
+%delay
+log_end = 300;
+x1 = test_input(1:log_end, 1:2)';
+x2 = test_target(1:log_end)';
+arc = arc_4(1:log_end)';
+xi1 = test_input(1:5, 1:2)';
+xi2 = test_target(1:5)';
+
+xi1_m = test_input(1:10, 1:2)';
+xi2_m = test_target(1:10)';
+
+threshold = 0.75;
+y_thresh = arc;
+y_thresh(arc > threshold) = 200;
 
 % NARX - C,V as Input, predict Voltage
-[y_new,xf1_new] = narx_d10_n8(test_input.',xi1_10pp.');
+%[y_new,xf1_new] = narx_d10_n32(test_input.',xi1_10pp.');
+[y_new,xf1,xf2] = narx_d5_n8(x1,x2,xi1,xi2);
+[y_new_m,xf1,xf2] = narx_d10_n16(x1,x2,xi1_m,xi2_m);
+
+% Best voltage pred for d5_n8 and d10_n16%%%%%%%%%%%%%%%%%%%%%
+%plot(1:length(y_new),x2,1:length(y_new),y_new),
+plot(1:length(y_new),x2,1:length(y_new),y_new, 1:length(y_new),y_thresh, 1:length(y_new),y_new_m),
+title('Predicted against actual short circuit - Testing'),
+grid on
 
 %% Save variables to file
 threshold = 0.75;

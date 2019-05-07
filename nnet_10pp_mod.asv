@@ -3,8 +3,10 @@ clear all
 clc
 
 % Add path (at beginning of script)
-added_path = [pwd,'/functions']; %change to: added_path = '/path' for your required path
-addpath(added_path);
+narx = [pwd,'/narx']; %change to: added_path = '/path' for your required path
+functions = [pwd,'/nn_function1']; %change to: added_path = '/path' for your required path
+addpath(narx);
+addpath(functions);
 
 %this script is predicting the rupture period
 log_start = 0.5e5-2;
@@ -59,11 +61,23 @@ clearvars -except train_input train_target test_input test_target arc_4 added_pa
 
 
 %% Generate prediction y_new
+% [y1,xf1,xf2] = myNeuralNetworkFunction(x1,x2,xi1,xi2) takes these arguments:
+%   x1 = 2xTS matrix, input #1
+%   x2 = 1xTS matrix, input #2
+%   xi1 = 2x10 matrix, initial 10 delay states for input #1.
+%   xi2 = 1x10 matrix, initial 10 delay states for input #2.
+% and returns:
+%   y1 = 1xTS matrix, output #1
+%   xf1 = 2x10 matrix, final 10 delay states for input #1.
+%   xf2 = 1x10 matrix, final 10 delay states for input #2.
+% where TS is the number of timesteps.
 %delay 
-xi1_10pp = test_input(1:10, 1:3);
+x1 = test_input(1:10, 1:2)';
+xi1 = test_input(1:10, 1:2)';
+xi2 = test_target(1:10)';
 
 % NARX - C,V as Input, predict Voltage
-[y_new,xf1_new] = narx_d10_n8(test_input.',xi1_10pp.');
+[y_new,xf1_new] = narx_d10_n32(test_input.',xi1_10pp.');
 
 %% Save variables to file
 threshold = 0.75;
@@ -82,4 +96,5 @@ save('script\y_pred.txt', 'ys', '-ASCII')
 save('script\y.txt', 'arc_4', '-ASCII')
 
 % Remove path (at end of script/script clean-up)
-rmpath(added_path);
+rmpath(narx);
+rmpath(functions);
