@@ -1,4 +1,4 @@
-from pandas import read_csv
+from pandas import read_csv, concat
 import matplotlib.pyplot as plt
 
 
@@ -71,7 +71,14 @@ def remove_small_short_circuits(short_idx, short_circuit_list):
 
 headers = ["current", "voltage", "short", "ref"]
 
-data = read_csv('..\data\log1.txt', names=headers, sep = "\t")
+log1 = read_csv('..\data\log1.txt', names=headers, sep = "\t")
+log2 = read_csv('..\data\log2.txt', names=headers, sep = "\t")
+log3 = read_csv('..\data\log3.txt', names=headers, sep = "\t")
+
+data = concat([log1, log2, log3])
+del log1
+del log2
+del log3
 
 #short_list = data.values[:, 2]
 short_list = data.short
@@ -103,17 +110,17 @@ data_cut_non_sc.to_csv('..\data\modified\data_cut_non_sc.csv', index=False, sep=
 
 plt.figure()
 start = 20000
-end = 21000
-plt.plot(data.short[start:end], 'b')
-plt.plot(data.rupture_5[start:end], 'y')
-plt.plot(data.rupture_10[start:end], 'g')
+end = 31000
+plt.plot(data.short[start:end], color='b', linewidth=3)
+plt.plot(data.rupture_5[start:end], color='y')
+plt.plot(data.rupture_10[start:end], color='g')
 plt.plot(data.rupture_spike[start:end], color='r', linestyle='--')
 plt.legend()
 
 plt.figure()
-plt.plot(data_cut_non_sc.short[start:end], 'b')
-plt.plot(data_cut_non_sc.rupture_5[start:end], 'y')
-plt.plot(data_cut_non_sc.rupture_10[start:end], 'g')
+plt.plot(data_cut_non_sc.short[start:end], color='b', linewidth=3)
+plt.plot(data_cut_non_sc.rupture_5[start:end], color='y')
+plt.plot(data_cut_non_sc.rupture_10[start:end], color='g')
 plt.plot(data_cut_non_sc.rupture_spike[start:end], color='r', linestyle='--')
 plt.legend()
 
