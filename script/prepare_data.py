@@ -71,14 +71,14 @@ def remove_small_short_circuits(short_idx, short_circuit_list):
 
 headers = ["current", "voltage", "short", "ref"]
 
-log1 = read_csv('..\data\log1.txt', names=headers, sep = "\t")
-log2 = read_csv('..\data\log2.txt', names=headers, sep = "\t")
-log3 = read_csv('..\data\log3.txt', names=headers, sep = "\t")
+data = read_csv('..\data\log4.txt', names=headers, sep = "\t")
+#log2 = read_csv('..\data\log2.txt', names=headers, sep = "\t")
+#log3 = read_csv('..\data\log3.txt', names=headers, sep = "\t")
 
-data = concat([log1, log2, log3])
-del log1
-del log2
-del log3
+#data = concat([log1, log2, log3])
+#del log1
+#del log2
+#del log3
 
 #short_list = data.values[:, 2]
 short_list = data.short
@@ -104,8 +104,8 @@ data['rupture_spike'] = rupture_list
 data_cut_non_sc = data[data.short != 0]
 
 
-data.to_csv('..\data\modified\data.csv', index=False, sep='\t')
-data_cut_non_sc.to_csv('..\data\modified\data_cut_non_sc.csv', index=False, sep='\t')
+data.to_csv('..\data\modified\data4.csv', index=False, sep='\t')
+data_cut_non_sc.to_csv('..\data\modified\data4_cut_non_sc.csv', index=False, sep='\t')
 
 
 plt.figure()
