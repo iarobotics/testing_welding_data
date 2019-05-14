@@ -3,9 +3,9 @@ clear all
 clc
 
 % Add path (at beginning of script)
-narx = [pwd,'\narx']; %change to: added_path = '/path' for your required path
-nn_function1 = [pwd,'\nn_function1']; %change to: added_path = '/path' for your required path
-nn_function2 = [pwd,'\nn_function1']; %change to: added_path = '/path' for your required path
+narx = [pwd,'\narx'];
+nn_function1 = [pwd,'\nn_function1'];
+nn_function2 = [pwd,'\nn_function1'];
 addpath(narx);
 addpath(nn_function1);
 addpath(nn_function2);
@@ -14,60 +14,56 @@ addpath(nn_function2);
 log_start = 0.5e5-2;
 
 % Load Original Migatronic log files
-log1 = importdata('data\log1.txt');
-current_voltage_1 = log1(log_start:end,1:2);
-voltage_1 = log1(log_start:end,2);
+log1 = importdata('data\modified\data1.csv');
+log1= log1.data;
+cv_1 = log1(log_start:end,1:2);
 cvs_1 = log1(log_start:end,1:3);
-arc_1 = log1(log_start:end,3);
+short_1 = log1(log_start:end,3);
+%rupture10_1 = log1(log_start:end,5);
+%rupture5_1 = log1(log_start:end,6);
+%rupture_spike_1 = log1(log_start:end,7);
 
-log2 = importdata('data\log2.txt');
-current_voltage_2 = log2(log_start:end,1:2);
-voltage_2 = log2(log_start:end,2);
+log2 = importdata('data\modified\data2.csv');
+log2= log2.data;
+cv_2 = log2(log_start:end,1:2);
 cvs_2 = log2(log_start:end,1:3);
-arc_2 = log2(log_start:end,3);
+short_2 = log2(log_start:end,3);
+%rupture10_2 = log2(log_start:end,5);
+%rupture5_2 = log2(log_start:end,6);
+%rupture_spike_2 = log2(log_start:end,7);
 
-log3 = importdata('data\log3.txt');
-cvs_3 = log3(log_start:end-4,1:3);
-current_voltage_3 = log3(log_start:end-4,1:2);
-voltage_3 = log3(log_start:end-4,2);
-arc_3 = log3(log_start:end-4,3);
+log3 = importdata('data\modified\data3.csv');
+log3= log3.data;
+cv_3 = log3(log_start:end,1:2);
+cvs_3 = log3(log_start:end,1:3);
+short_3 = log3(log_start:end,3);
+%rupture10_3 = log3(log_start:end,5);
+%rupture5_3 = log3(log_start:end,6);
+%rupture_spike_3 = log3(log_start:end,7);
 
-log4 = importdata('data\log4.txt');
-cvs_4 = log4(log_start:end-4,1:3);
-voltage_4 = log4(log_start:end-4,2);
-current_voltage_4 = log4(log_start:end-4,1:2);
-arc_4 = log4(log_start:end-4,3);
+log4 = importdata('data\modified\data4.csv');
+log4= log4.data;
+cv_4 = log4(log_start:end,1:2);
+cvs_4 = log4(log_start:end,1:3);
+short_4 = log4(log_start:end,3);
+%rupture10_4 = log4(log_start:end,5);
+%rupture5_4 = log4(log_start:end,6);
+%rupture_spike_4 = log4(log_start:end,7);
 
 
-% Load modifie log files
-log_r1 = importdata('data\data_1_cut_first_90p.txt');
-rupture_r1 = log_r1(:,3);
-rupture_r1 = [rupture_r1;1;1;1];
-
-log_r2 = importdata('data\data_2_cut_first_90p.txt');
-rupture_r2 = log_r2(1:end-5,3);
-
-log_r3 = importdata('data\data_3_cut_first_90p.txt');
-rupture_r3 = log_r3(:,3);
-
-train_input = [current_voltage_1; current_voltage_2; current_voltage_3];
+train_input = [cv_1; cv_2; cv_3];
 %train_input = [cvs_1; cvs_2; cvs_3];
 
-
-train_target = [rupture_r1; rupture_r2; rupture_r3];
-%train_target = [voltage_1;voltage_2;voltage_3];
-%train_target = [arc_1;arc_2;arc_3];
+%train_target = [rupture_r1; rupture_r2; rupture_r3];
+train_target = [short_1; short_2; short_3];
 
 % New data for testing the model
-log_r4 = importdata('data\data_4_cut_first_90p.txt');
+%test_input = cv_4;
+test_input = cvs_4;
 
-%test_input = cvs_4;
-test_input = current_voltage_4;
+test_target = short_4;
 
-%test_target = log_r4(:,2);
-test_target = log_r4(:,2);
-
-clearvars -except train_input train_target test_input test_target arc_4 added_path
+clearvars -except train_input train_target test_input test_target
 
 
 %% Generate prediction y_new
