@@ -99,7 +99,7 @@ delayed_current_voltage_short4 = current_voltage_short4(11:end, 1:3);
 
 %% Run NN
 %[y1,xf1] = myNeuralNetworkFunction_io(all_voltages.',xi1.');
-[y1,xf1] = nio_d10n16_r5(delayed_current_voltage_arc4_nonsc.', xi1_nonsc.');
+[y1,xf1] = nio_d10n16_r10(delayed_all3_curr_volt_arc_nonsc.', xi1.');
 
 % Threshold the NN y output
 threshold = 0.5;
@@ -108,10 +108,10 @@ y_thresh(y1 < threshold) = 0;
 y_thresh(y1 > threshold) = 1;
 
 % save thresholded output
-ys = rupture4_10nonsc(11:end,1); % actual signal of the rupture - not predicted
+ys = rupture4_10(11:end,1); % actual signal of the rupture - not predicted
 save('script\y.txt', 'ys', '-ASCII')
 ys=y_thresh'; % thresholded prediction
-save('script\d10n16_r5_thr05.txt', 'ys', '-ASCII')
+save('script\y_pred.txt', 'ys', '-ASCII')
 
 
 %plot network output against actual arc for the data used for training
