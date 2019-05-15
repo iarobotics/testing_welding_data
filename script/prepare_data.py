@@ -74,7 +74,7 @@ def remove_small_short_circuits(short_idx, short_circuit_list):
 headers = ["current", "voltage", "short", "ref"]
 
 data = read_csv('..\data\log4.txt', names=headers, sep = "\t")
-#log2 = read_csv('..\data\log2.txt', names=headers, sep = "\t")
+pred = read_csv('d10n16_r5_thr05.txt', names=["rpred"], sep = "\n")
 #log3 = read_csv('..\data\log3.txt', names=headers, sep = "\t")
 
 #data = concat([log1, log2, log3])
@@ -119,43 +119,128 @@ data_cut_non_sc = data[data.short != 0]
 #data_cut_non_sc.to_csv('..\data\modified\data4_cut_non_sc.csv', index=False, sep='\t')
 
 
-plt.figure()
-start = 20000
-end = 31000
-plt.plot(data.short[start:end], color='b', linewidth=2)
-#plt.plot(data.short[start:end], color='b')
-plt.plot(data.rupture_5[start:end], color='y', linestyle='--')
-plt.plot(data.rupture_10[start:end], color='g', linestyle='--')
-#plt.plot(data.rupture_spike[start:end], color='r', linestyle='--')
-plt.legend()
+d=10
+start = 50000+d-1
+end = 50500+d-1
+# plt.figure()
+# plt.plot(data.short[start:end], color='b', linewidth=2)
+# #plt.plot(data.short[start:end], color='b')
+# plt.plot(data.rupture_5[start:end], color='y', linestyle='--')
+# #plt.plot(data.rupture_10[start:end], color='g', linestyle='--')
+# #plt.plot(data.rupture_spike[start:end], color='r', linestyle='--')
+# #plt.plot(pred.rpred[:1000], color='y', linestyle='--')
+# plt.legend()
+
+# plt.figure()
+# #plt.plot(data_cut_non_sc.short[start:end], color='b', linewidth=3)
+# plt.plot(data_cut_non_sc.short[start:end], color='b')
+# plt.plot(data_cut_non_sc.rupture_5[start:end], color='y')
+# plt.plot(data_cut_non_sc.rupture_10[start:end], color='g')
+# plt.plot(data_cut_non_sc.rupture_spike[start:end], color='r', linestyle='--')
+# plt.legend()
+
 
 plt.figure()
-#plt.plot(data_cut_non_sc.short[start:end], color='b', linewidth=3)
-plt.plot(data_cut_non_sc.short[start:end], color='b')
-plt.plot(data_cut_non_sc.rupture_5[start:end], color='y')
-plt.plot(data_cut_non_sc.rupture_10[start:end], color='g')
-plt.plot(data_cut_non_sc.rupture_spike[start:end], color='r', linestyle='--')
-plt.legend()
+plot_len = 4
+
+plt.subplot(plot_len, 1, 1)
+plt.plot(data_cut_non_sc.values[start:end, 2], color='b')
+plt.title('Short circuit', y=0.5, loc='left', color='b')
+
+plt.subplot(plot_len, 1, 2)
+plt.plot(data_cut_non_sc.values[start:end, 4], color='y')
+plt.title('Rupture_10', y=0.5, loc='left', color='y')
+
+plt.subplot(plot_len, 1, 3)
+plt.plot(data_cut_non_sc.values[start:end, 5], color='g')
+plt.plot(pred.values[:500, 0], color='r')
+plt.title('Rupture_5', y=0.5, loc='left', color='g')
+
+plt.subplot(plot_len, 1, 4)
+plt.plot(pred.values[:500, 0], color='r')
+plt.title('Rupture_5', y=0.5, loc='left', color='g')
 
 plt.show()
 
+#short_idx = get_short_circuit_idx(data_cut_non_sc.rupture_5)
+short_idx = get_short_circuit_idx(data_cut_non_sc.values[start:,5])
 
-# short_idx = get_short_circuit_idx(data_cut_non_sc.rupture_10)
+count = 0
+for s,e in short_idx:
+    #print(s,e)
+    if e-s <= 0:
+        print(f'zero {e-s}')
+    if e-s == 5:
+        count += 1
 
-# count = 0
-# for s,e in short_idx:
-#     if e-s <= 0:
-#         print(f'zero {e-s}')
-#     if e-s == 10:
-#         count += 1
+print(count)
+print(len(short_idx))
 
-# print("Here")
-# print(count)
-# print(len(short_idx))
+print("Rupture 5")
+print(data_cut_non_sc.values[start+56:start+61,5])
+print("Rupture pred")
+print(pred.values[56:61, 0])
 
-for start,end in short_idx:
-    print(end - start)
+# for start,end in short_idx:
+#     print(end - start)
 
+##any value before rupture--fail
+##if not pass
+# short circuits last between "end" idx of rupture periods
+
+passed_5 = 0
+failed_5 = 0
+passed_10 = 0
+failed_10 = 0
+
+margin = -1
+
+end_prev = 0
+for start, end in short_idx:
+    # All samples before the rupture period in current short-circuit
+    failed = False
+    passed = False
+    for val in pred.values[end_prev:start,0]:
+        if val:
+            failed = True
+
+    if not failed:
+        for val in pred.values[start:end-margin,0]:
+            if val:
+                passed_5 += 1
+                passed = True
+                break
+        if not passed:
+            failed_5 += 1
+    else:
+        failed_5 += 1
+
+
+    end_prev = end
+
+end_prev = 0
+for start, end in short_idx:
+    # All samples before the rupture period in current short-circuit
+    failed = False
+    for val in pred.values[end_prev:start-5,0]:
+        if val == 1:
+            failed = True
+
+    if not failed:
+        for val in pred.values[start-5:end-margin,0]:
+            if val == 1:
+                passed_10 += 1
+                break
+    else:
+        failed_10 += 1
+
+    end_prev = end
+
+print(f"Passed_5: {passed_5}")
+print(f"Failed_5: {failed_5}")
+print(f"Passed_10: {passed_10}")
+print(f"Failed_10: {failed_10}")
+print(f"Total short-circuits: {len(short_idx)}")
 
 
 
