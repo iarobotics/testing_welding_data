@@ -55,10 +55,11 @@ xdts = mod(ts+9,11)+1;
 xd1(:,xdts) = mapminmax_apply(x1(:,ts),x1_step1);
 % Layer 1
 tapdelay1 = reshape(xd1(:,mod(xdts-[1 2 3 4 5 6 7 8 9 10]-1,11)+1),20,1);
+
+ax = IW1_1 * ones(20,1);
+axx = IW1_1 * tapdelay1;
+axxx = b1 + IW1_1*tapdelay1;
 a1 = tansig_apply(b1 + IW1_1*tapdelay1);
-ax = b1 + IW1_1*tapdelay1;
-axx = IW1_1 * ones(20,1);
-axxx = IW1_1 * tapdelay1;
 
 % Layer 2
 a2 = b2 + LW2_1*a1;

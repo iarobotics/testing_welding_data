@@ -7,17 +7,20 @@
 *   xf1 = 2x10 matrix, final 10 delay states for input #1.
 * where TS is the number of timesteps.
 **/
+const int num_inputs = 2;
+// timesteps
+const int ts = 1;
+const int d = 10;
+const int double_delay = d*2;
+const int num_neurons = 10;
+const int w1_cols = num_inputs * d;
+
 unsigned long time_start;
 unsigned long time_end;
 
 const int x1_step1_xoffset[] = {588, 52}; // Column vector
 const double x1_step1_gain[] = {0.000550206327372765, 0.0045662100456621}; // Column vector
 const int x1_step1_ymin = -1;
-
-const int num_inputs = 2;
-// timesteps
-const int ts = 1;
-const int d = 10;
 
 //x1 2 time steps
 const int input[num_inputs][ts] = {
@@ -39,15 +42,15 @@ const int input_initial[num_inputs][d] = {
 
 // ===== NEURAL NETWORK CONSTANTS =====
 // Layer 1
-const double b1[10] = {
+const double b1[num_neurons] = {
     -4.8103382239472978199, 6.4804560577834831037,
     -7.0785687625136448631, -7.4447988349325484592,
     -4.6759512794534279223, -5.1366434222714856261,
     -3.7249942757126945914, -4.7207034319208824868,
     7.7607704728766657709, 17.59196954093474119};
 
-// num_neurons x (num_inputs x delay)
-const double iw1_1[10][20] = {
+// num_neurons x (num_inputs x delay) 10x20
+const double iw1_1[num_neurons][w1_cols] = {
     {
         9.658126969864468947, 5.7803138312073132354,
         8.6163694803768269281, -7.7437324618457283876,
@@ -173,7 +176,7 @@ const double iw1_1[10][20] = {
 //Layer 2
 const double b2 = -2.2920076624970211476;
 
-const double lw2_1[] = {
+const double lw2_1[num_neurons] = {
     20.902116062013480047, 13.339710972299895886,
     12.076856966595276077, 0.55025560154176866856,
     -24.132607464655464469, -2.6857866551215234807,
@@ -193,15 +196,13 @@ double xd1[num_inputs][d + 1] = {0};
 //double y1[ts] = {0};
 double y1 = 0;
 
-// xdts related
-int xdts = 0;
-int reshape_arr[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-int reshape_temp[d] = {0};
+//int xdts = 0;
 
 // 20x1 matrix
 double tapdelay1[d*2] = {0};
-double a1[10] = {0};
+double a1[num_neurons] = {0};
 double a2 = 0;
+int col = 0;
 
 void setup()
 {
@@ -211,9 +212,11 @@ void setup()
 void loop()
 {
     time_start = micros();
-    double tapdelay1[d*2] = {0};
-    double a1[10] = {0};
-    double a2 = 0;
+    //double tapdelay1[d*2] = {0};
+    //double a1[10] = {0};
+    //double a2 = 0;
+    col = d-1;
+    a2 = 0;
 
     //xd1 = mapminmax_apply(xi1,x1_step1);
     //xd1 = [xd1 zeros(2,1)];
@@ -231,49 +234,42 @@ void loop()
     }
 
     ///////////////////////////// Unnecessary?
-    xdts = ((0+d) % (d+1));
-    // Input 1
-    //xd1(:,xdts) = mapminmax_apply(x1(:,ts),x1_step1);
-    for(int i = 0; i < num_inputs; i++) // For every row
-    {
-        xd1[i][xdts] = input[i][0] - x1_step1_xoffset[i];
-        xd1[i][xdts] *= x1_step1_gain[i];
-        xd1[i][xdts] += x1_step1_ymin;
-    }
+    // xdts = ((0+d) % (d+1));
+    // // Input 1
+    // //xd1(:,xdts) = mapminmax_apply(x1(:,ts),x1_step1);
+    // for(int i = 0; i < num_inputs; i++) // For every row
+    // {
+    //     xd1[i][xdts] = input[i][0] - x1_step1_xoffset[i];
+    //     xd1[i][xdts] *= x1_step1_gain[i];
+    //     xd1[i][xdts] += x1_step1_ymin;
+    // }
 
     // Reverse xd1 columns and reshape to d*2x1
-
-    int col = d-1;
-    for(int i = 0; i < d*2; i += 2) // For every row
+    for(int i = 0; i < double_delay; i += 2) // For every row
     {
         tapdelay1[i] = xd1[0][col];
         tapdelay1[i+1] = xd1[1][col];
         col--;
         // Add required lines if num_inputs increases
-        // TODO: This matrix may be removed and instead perform operations directly on xd1
+        // TODO: Check if this matrix can be removed and instead perform operations directly on xd1
     }
 
     //a1 = tansig_apply(b1 + IW1_1*tapdelay1);
-    for(int i = 0; i < 10; i++) // For every row
+    for(int i = 0; i < num_neurons; i++) // For every row
     {
         a1[i] = b1[i];
-        for(int j = 0; j < 20; j++) // For every column
+        for(int j = 0; j < w1_cols; j++) // For every column
         {
             a1[i] += iw1_1[i][j] * tapdelay1[j];
             //a1[i] += 2 / ( 1 + exp( 1 + ( -2 * (iw1_1[i][j] * tapdelay1[j] + b1[i]) ) ) ) - 1;
             // a = 2 ./ (1 + exp(-2*n)) - 1;
         }
         a1[i] = 2 / (1 + exp(-2 * a1[i])) - 1;
-    }
-
-    // Layer 2
-    //a2 = b2 + LW2_1*a1;
-    // b2 (1x1)  lw2_1 (1x10) a1(10x1)
-    for(int i = 0; i < 10; i ++) // For every row
-    {
+        //TODO: Replace with lookup table
         a2 += lw2_1[i] * a1[i];
     }
     a2 += b2;
+
 
     // Output 1
     y1 = a2 - y1_step1_ymin;
@@ -300,7 +296,7 @@ void loop()
     Serial.print("Runtime: ");
     Serial.print(time_end - time_start);
     Serial.print(" Predcition: ");
-    Serial.println(y1);
+    Serial.println(y1,4);
 
     delay(1000);          // wait a second so as not to send massive amounts of data
 
