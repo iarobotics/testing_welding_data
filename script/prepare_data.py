@@ -15,6 +15,7 @@ def get_short_circuit_idx(short_circuit_list):
                 start = idx
         else:
             if short:
+                #end = idx-1 TODO: Enable this
                 end = idx
                 short_idx.append((start, end))
                 short = False
@@ -27,11 +28,12 @@ def get_short_circuit_idx(short_circuit_list):
 def get_rupture_region_from_short(short_idx, short_circuit_list, region_size: int=10, ignore_short_sc=True, spike_rupture=False):
     """
     Generate rupture region as the last region_size (10) samples of a short-circuit period.
-    Set SC period lower than the region_size are set to 0
+    Set SC period lower than the region_size to 0
     Returns the rupture region list and the modified short_circuit list.
     """
 
     rupture = short_circuit_list.copy()
+    short_list = short_circuit_list.copy()
 
     for start, end in short_idx:
 
@@ -41,7 +43,7 @@ def get_rupture_region_from_short(short_idx, short_circuit_list, region_size: in
             if ignore_short_sc:
                 while idx <= end:
                     rupture[idx] = 0
-                    short_circuit_list[idx] = 0
+                    short_list[idx] = 0
                     idx += 1
             else:
                 continue
@@ -55,7 +57,7 @@ def get_rupture_region_from_short(short_idx, short_circuit_list, region_size: in
                     rupture[idx] = 0
                     idx += 1
 
-    return rupture, short_circuit_list
+    return rupture, short_list
 
 def remove_small_short_circuits(short_idx, short_circuit_list):
 
@@ -76,9 +78,7 @@ data = read_csv('..\data\log4.txt', names=headers, sep = "\t")
 #log3 = read_csv('..\data\log3.txt', names=headers, sep = "\t")
 
 #data = concat([log1, log2, log3])
-#del log1
-#del log2
-#del log3
+
 
 #short_list = data.values[:, 2]
 short_list = data.short
@@ -93,32 +93,45 @@ rupture_list, short_list = get_rupture_region_from_short(short_idx, short_list, 
 data['rupture_10'] = rupture_list
 data['short'] = short_list
 
-rupture_list, short_list = get_rupture_region_from_short(short_idx, short_list, region_size=5)
-data['rupture_5'] = rupture_list
+rupture_list_5, _ = get_rupture_region_from_short(short_idx, short_list, region_size=5)
+data['rupture_5'] = rupture_list_5
 
-rupture_list, short_list = get_rupture_region_from_short(short_idx, short_list, region_size=10, spike_rupture=True)
-data['rupture_spike'] = rupture_list
+rupture_list_spike, _ = get_rupture_region_from_short(short_idx, short_list, region_size=10, spike_rupture=True)
+data['rupture_spike'] = rupture_list_spike
 
 
 # New data frame with removed non-short-circuit samples
 data_cut_non_sc = data[data.short != 0]
 
+# new_list = []
+# for start,end in short_idx:
+#     alist = []
+#     while start < end+1:
+#         alist.append(short_list[start])
 
-data.to_csv('..\data\modified\data4.csv', index=False, sep='\t')
-data_cut_non_sc.to_csv('..\data\modified\data4_cut_non_sc.csv', index=False, sep='\t')
+#     new_list.append(alist)
+#     alist.clear()
+
+
+
+
+#data.to_csv('..\data\modified\data4.csv', index=False, sep='\t')
+#data_cut_non_sc.to_csv('..\data\modified\data4_cut_non_sc.csv', index=False, sep='\t')
 
 
 plt.figure()
 start = 20000
 end = 31000
-plt.plot(data.short[start:end], color='b', linewidth=3)
-plt.plot(data.rupture_5[start:end], color='y')
-plt.plot(data.rupture_10[start:end], color='g')
-plt.plot(data.rupture_spike[start:end], color='r', linestyle='--')
+plt.plot(data.short[start:end], color='b', linewidth=2)
+#plt.plot(data.short[start:end], color='b')
+plt.plot(data.rupture_5[start:end], color='y', linestyle='--')
+plt.plot(data.rupture_10[start:end], color='g', linestyle='--')
+#plt.plot(data.rupture_spike[start:end], color='r', linestyle='--')
 plt.legend()
 
 plt.figure()
-plt.plot(data_cut_non_sc.short[start:end], color='b', linewidth=3)
+#plt.plot(data_cut_non_sc.short[start:end], color='b', linewidth=3)
+plt.plot(data_cut_non_sc.short[start:end], color='b')
 plt.plot(data_cut_non_sc.rupture_5[start:end], color='y')
 plt.plot(data_cut_non_sc.rupture_10[start:end], color='g')
 plt.plot(data_cut_non_sc.rupture_spike[start:end], color='r', linestyle='--')
@@ -127,17 +140,21 @@ plt.legend()
 plt.show()
 
 
-short_idx = get_short_circuit_idx(data_cut_non_sc.rupture_10)
+# short_idx = get_short_circuit_idx(data_cut_non_sc.rupture_10)
 
-count = 0
-for s,e in short_idx:
-    if e-s <= 0:
-        print(f'zero {e-s}')
-    if e-s == 10:
-        count += 1
+# count = 0
+# for s,e in short_idx:
+#     if e-s <= 0:
+#         print(f'zero {e-s}')
+#     if e-s == 10:
+#         count += 1
 
-print(count)
-print(len(short_idx))
+# print("Here")
+# print(count)
+# print(len(short_idx))
+
+for start,end in short_idx:
+    print(end - start)
 
 
 
