@@ -74,9 +74,10 @@ def remove_small_short_circuits(short_idx, short_circuit_list):
 headers = ["current", "voltage", "short", "ref"]
 
 data = read_csv('..\data\log4.txt', names=headers, sep = "\t")
-pred = read_csv('d10n16_r5_thr05.txt', names=["rpred"], sep = "\n")
+pred = read_csv('d10n16_r10_thr065.txt', names=["rpred"], sep = "\n")
 #log3 = read_csv('..\data\log3.txt', names=headers, sep = "\t")
 
+#d10n4_r10_thr05
 #data = concat([log1, log2, log3])
 
 
@@ -160,29 +161,27 @@ plt.subplot(plot_len, 1, 4)
 plt.plot(pred.values[:500, 0], color='r')
 plt.title('Rupture_5', y=0.5, loc='left', color='g')
 
-plt.show()
+#plt.show()
 
 #short_idx = get_short_circuit_idx(data_cut_non_sc.rupture_5)
 short_idx = get_short_circuit_idx(data_cut_non_sc.values[start:,5])
 
-count = 0
-for s,e in short_idx:
-    #print(s,e)
-    if e-s <= 0:
-        print(f'zero {e-s}')
-    if e-s == 5:
-        count += 1
+# count = 0
+# for s,e in short_idx:
+#     #print(s,e)
+#     if e-s <= 0:
+#         print(f'zero {e-s}')
+#     if e-s == 5:
+#         count += 1
 
-print(count)
-print(len(short_idx))
+# print(count)
+# print(len(short_idx))
 
-print("Rupture 5")
-print(data_cut_non_sc.values[start+56:start+61,5])
-print("Rupture pred")
-print(pred.values[56:61, 0])
+# print("Rupture 5")
+# print(data_cut_non_sc.values[start+56:start+61,5])
+# print("Rupture pred")
+# print(pred.values[56:61, 0])
 
-# for start,end in short_idx:
-#     print(end - start)
 
 ##any value before rupture--fail
 ##if not pass
@@ -193,7 +192,7 @@ failed_5 = 0
 passed_10 = 0
 failed_10 = 0
 
-margin = -1
+margin = 1
 
 end_prev = 0
 for start, end in short_idx:
@@ -215,32 +214,36 @@ for start, end in short_idx:
     else:
         failed_5 += 1
 
-
     end_prev = end
 
 end_prev = 0
 for start, end in short_idx:
     # All samples before the rupture period in current short-circuit
     failed = False
+    passed = False
     for val in pred.values[end_prev:start-5,0]:
-        if val == 1:
+        if val:
             failed = True
 
     if not failed:
         for val in pred.values[start-5:end-margin,0]:
-            if val == 1:
+            if val:
                 passed_10 += 1
+                passed = True
                 break
+        if not passed:
+            failed_10 += 1
     else:
         failed_10 += 1
 
     end_prev = end
 
-print(f"Passed_5: {passed_5}")
-print(f"Failed_5: {failed_5}")
-print(f"Passed_10: {passed_10}")
-print(f"Failed_10: {failed_10}")
-print(f"Total short-circuits: {len(short_idx)}")
+print(f"Passed_10: {passed_5}")
+print(f"Failed_10: {failed_5}")
+print(f"R10 Got {passed_5+failed_5} out of {len(short_idx)}")
+print(f"Passed_5: {passed_10}")
+print(f"Failed_5: {failed_10}")
+print(f"R5 Got {passed_10+failed_10} out of {len(short_idx)}")
 
 
 
