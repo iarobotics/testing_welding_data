@@ -74,9 +74,11 @@ def remove_small_short_circuits(short_idx, short_circuit_list):
 #headers = ["current", "voltage", "short", "ref"]
 headers = ["current", "voltage", "short", "iac", "ref"]
 
-data = read_csv('..\data\log4.txt', names=headers, sep = "\t")
-#data = read_csv('..\data\log_iac.txt', names=headers, sep = "\t", skiprows=50000)
-pred = read_csv('d10n16_r5_thr065.txt', names=["rpred"], sep = "\n")
+#data = read_csv('..\data\log4.txt', names=headers, sep = "\t")
+data = read_csv('..\data\log_iac.txt', names=headers, sep = "\t", skiprows=50000)
+#pred = read_csv('d10n16_r5_thr065.txt', names=["rpred"], sep = "\n")
+pred = read_csv('iac_d10n16_r5_thr065.txt', names=["rpred"], sep = "\n")
+pred2 = read_csv('iac_d4n4_r5_thr065.txt', names=["rpred"], sep = "\n")
 #log3 = read_csv('..\data\log3.txt', names=headers, sep = "\t")
 
 #d10n4_r10_thr05
@@ -108,58 +110,44 @@ data_cut_non_sc = data[data.short != 0]
 
 
 #data.to_csv('..\data\modified\data4.csv', index=False, sep='\t')
-#data_cut_non_sc.to_csv('..\data\modified\data4_cut_non_sc.csv', index=False, sep='\t')
+#data_cut_non_sc.to_csv('..\data\modified\data_iac_cut_non_sc.csv', index=False, sep='\t')
 
-d=10
-start = 50000+d-1
+d=4
+log_start = 0
+window = 3000
+#log_start = 55000 -1 # To account for Matlab non-zero indexing
+start = log_start+d
 #end = 50500+d-1
-end = 60500+d-1
-
-# plt.figure()
-# plt.plot(data.short[start:end], color='b', linewidth=2)
-# #plt.plot(data.short[start:end], color='b')
-# plt.plot(data.rupture_5[start:end], color='y', linestyle='--')
-# #plt.plot(data.rupture_10[start:end], color='g', linestyle='--')
-# #plt.plot(data.rupture_spike[start:end], color='r', linestyle='--')
-# #plt.plot(pred.rpred[:1000], color='y', linestyle='--')
-# plt.legend()
-
-# plt.figure()
-# #plt.plot(data_cut_non_sc.short[start:end], color='b', linewidth=3)
-# plt.plot(data_cut_non_sc.short[start:end], color='b')
-# plt.plot(data_cut_non_sc.rupture_5[start:end], color='y')
-# plt.plot(data_cut_non_sc.rupture_10[start:end], color='g')
-# plt.plot(data_cut_non_sc.rupture_spike[start:end], color='r', linestyle='--')
-# plt.legend()
+end = log_start + window + d
 
 
-plt.figure()
+
+plt.figure(1)
 plot_len = 6
 
-
 plt.subplot(plot_len, 1, 1)
-plt.plot(data.values[start:end, 0], color='r')
-plt.title('Current', y=0.5, loc='left', color='r')
+plt.plot(data.values[start:end, 0], color='c')###
+plt.title('Current', y=0.5, loc='left', color='c')
 
 plt.subplot(plot_len, 1, 2)
-plt.plot(data.values[start:end, 1], color='b')
-plt.title('Voltage', y=0.5, loc='left', color='b')
+plt.plot(data.values[start:end, 1], color='m')###
+plt.title('Voltage', y=0.5, loc='left', color='m')
 
 plt.subplot(plot_len, 1, 3)
-plt.plot(data.values[start:end, 2], color='c')
-plt.title('Short-circuit', y=0.5, loc='left', color='c')
+plt.plot(data.values[start:end, 2], color='r')
+plt.title('Short-circuit', y=0.5, loc='left', color='r')###
 
 plt.subplot(plot_len, 1, 4)
-plt.plot(data.values[start:end, 3], color='c')
-plt.title('IAC', y=0.5, loc='left', color='c')
+plt.plot(data.values[start:end, 5], color='g')
+plt.title('Rupture', y=0.5, loc='left', color='g')###
 
 plt.subplot(plot_len, 1, 5)
-plt.plot(data.values[start:end, 5], color='y')
-plt.title('Rupture', y=0.5, loc='left', color='y')
+plt.plot(data.values[start:end, 3], color='b')
+plt.title('IAC', y=0.5, loc='left', color='b')###
 
 plt.subplot(plot_len, 1, 6)
-plt.plot(data.values[start:end, 4], color='y')
-plt.title('ref', y=0.5, loc='left', color='y')
+plt.plot(data.values[start:end, 4], color='k')
+plt.title('ref', y=0.5, loc='left', color='k')
 
 # plt.subplot(plot_len, 1, 3)
 # plt.plot(data_cut_non_sc.values[start:end, 5], color='g')
@@ -170,11 +158,62 @@ plt.title('ref', y=0.5, loc='left', color='y')
 # plt.plot(pred.values[:500, 0], color='g')
 # plt.title('Rupture predicted', y=0.5, loc='left', color='g')
 
+plt.figure(2)
+plot_len = 7
+
+plt.subplot(plot_len, 1, 1)
+plt.plot(data_cut_non_sc.values[start:end, 0], color='c')###
+plt.title('Current', y=0.5, loc='left', color='c')
+
+plt.subplot(plot_len, 1, 2)
+plt.plot(data_cut_non_sc.values[start:end, 1], color='m')###
+plt.title('Voltage', y=0.5, loc='left', color='m')
+
+plt.subplot(plot_len, 1, 3)
+plt.plot(data_cut_non_sc.values[start:end, 2], color='r')###
+plt.title('Short-circuit', y=0.5, loc='left', color='r')
+
+plt.subplot(plot_len, 1, 4)
+plt.plot(data_cut_non_sc.values[start:end, 5], color='g')###
+plt.title('Rupture', y=0.5, loc='left', color='g')
+
+plt.subplot(plot_len, 1, 5)
+plt.plot(data_cut_non_sc.values[start:end, 3], color='b')###
+plt.title('IAC', y=0.5, loc='left', color='b')
+
+# plt.subplot(plot_len, 1, 6)
+# plt.plot(pred.values[start-d:end-d, 0], color='y')###
+# plt.title('Prediction D10_N16', y=0.5, loc='left', color='y')
+
+plt.subplot(plot_len, 1, 6)
+plt.plot(pred2.values[start-d:end-d, 0], color='y')###
+plt.title('Prediction D4_N4', y=0.5, loc='left', color='y')
+
+plt.subplot(plot_len, 1, 7)
+plt.plot(data_cut_non_sc.values[start:end, 4], color='k')
+plt.title('ref', y=0.5, loc='left', color='k')
+
+
+plt.figure(3)
+
+#plt.plot(data_cut_non_sc.values[start:end, 1], color='r') # voltage
+plt.plot(data_cut_non_sc.values[start:end, 2], color='r', label="Short-Circuit") # short
+plt.plot(data_cut_non_sc.values[start:end, 5], color='g', linewidth=4, label="Rupture") # rupture 10
+plt.plot(data_cut_non_sc.values[start:end, 3], color='b', linestyle='--', label="IAC") # iac
+#plt.plot(pred.values[start-d:end-d, 0], color='y', label="Prediction D10_N16")
+plt.plot(pred2.values[start-d:end-d, 0], color='y', label="Prediction D4_N4")
+plt.legend(bbox_to_anchor=(1, 1))
+plt.grid()
+
 #plt.show()
 
 #short_idx = get_short_circuit_idx(data_cut_non_sc.rupture_5)
-short_idx = get_short_circuit_idx(data_cut_non_sc.values[start:,5]) # index of rupture 10
+#short_idx = get_short_circuit_idx(data_cut_non_sc.values[start:,5]) # index of rupture 10
 #short_idx = get_short_circuit_idx(data_cut_non_sc.values[start:,6]) # index of rupture 5
+
+# print(data_cut_non_sc.values[start:start+10,:])
+print(data_cut_non_sc.values[start:,:].shape)
+print(pred.values[start-d:,:].shape)
 
 
 # count = 0
@@ -248,7 +287,7 @@ def get_pass_fail_old(short_idx):
     print(f"Failed_5: {failed_10}")
     print(f"R5 Got {passed_10+failed_10} out of {len(short_idx)}")
 
-def get_pass_fail(short_idx, values):
+def get_pass_fail(short_idx, values, fail_at_early_prediction = True):
 
     """
     Compare generated rupture with prediction - get short_idx of rupture_10 and compare against prediction of rupture_5
@@ -269,9 +308,11 @@ def get_pass_fail(short_idx, values):
         # All samples before the rupture period in current short-circuit
         failed = False
         passed = False
-        for val in values[end_prev:start]:
-            if val:
-                failed = True
+        # Fail if there is a prediction before the rupture period
+        if fail_at_early_prediction:
+            for val in values[end_prev:start]:
+                if val:
+                    failed = True
 
         if not failed:
             for val in values[start:end-margin]:
@@ -293,9 +334,14 @@ def get_pass_fail(short_idx, values):
 
 
 #get_pass_fail(short_idx, data_cut_non_sc.values[:,3])
-get_pass_fail(short_idx, pred.values[:,0])
+# Compare rupture_10 with iac
+iac = data_cut_non_sc.values[:,3] # IAC signal
+predicted = pred.values[start-d:,0]
 
-test = data.values[:,3]
+short_idx = get_short_circuit_idx(data_cut_non_sc.values[start:,5]) # indexes of rupture 10
+
+#get_pass_fail(short_idx, iac, fail_at_early_prediction=False)
+get_pass_fail(short_idx, predicted, fail_at_early_prediction=False)
 
 """
 At this point we have a data frame with 5 columns.
