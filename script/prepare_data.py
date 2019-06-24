@@ -113,8 +113,12 @@ data_cut_non_sc = data[data.short != 0]
 #data_cut_non_sc.to_csv('..\data\modified\data_iac_cut_non_sc.csv', index=False, sep='\t')
 
 d=4
-log_start = 0
-window = 3000
+# log_start = 0
+# window = 3000
+log_start = 1450
+window = 250
+
+
 #log_start = 55000 -1 # To account for Matlab non-zero indexing
 start = log_start+d
 #end = 50500+d-1
@@ -158,7 +162,19 @@ plt.title('ref', y=0.5, loc='left', color='k')
 # plt.plot(pred.values[:500, 0], color='g')
 # plt.title('Rupture predicted', y=0.5, loc='left', color='g')
 
+plt.figure(5)
+
+plt.plot(data.values[start:end, 0]*0.0005, color='c', label="Current")
+plt.plot(data.values[start:end, 1]*0.005 -0.2, color='m', label="Voltage")
+plt.plot(data.values[start:end, 2], color='r', label="Short-circuit")###
+plt.plot(data.values[start:end, 5]*0.95, color='g', label="Rupture")###
+plt.plot(data.values[start:end, 3]*0.90, color='b', label="IAC")###
+plt.legend(bbox_to_anchor=(1, 1))
+
+
 plt.figure(2)
+start = start+110
+end = start+80
 plot_len = 7
 
 plt.subplot(plot_len, 1, 1)
@@ -205,7 +221,32 @@ plt.plot(pred2.values[start-d:end-d, 0], color='y', label="Prediction D4_N4")
 plt.legend(bbox_to_anchor=(1, 1))
 plt.grid()
 
-#plt.show()
+
+plt.figure(4)
+
+plt.plot(data_cut_non_sc.values[start:end, 0]*0.0003 -0.2, color='c')###
+plt.title('Current', y=0.5, loc='left', color='c')
+
+plt.plot(data_cut_non_sc.values[start:end, 1]*0.005 -0.2, color='m')###
+plt.title('Voltage', y=0.5, loc='left', color='m')
+
+plt.plot(data_cut_non_sc.values[start:end, 2], color='r')###
+plt.title('Short-circuit', y=0.5, loc='left', color='r')
+
+plt.plot(data_cut_non_sc.values[start:end, 5]*0.95, color='g')###
+plt.title('Rupture', y=0.5, loc='left', color='g')
+
+plt.plot(data_cut_non_sc.values[start:end, 3]*0.90, color='b')###
+plt.title('IAC', y=0.5, loc='left', color='b')
+
+plt.plot(pred2.values[start-d:end-d, 0]*0.85, color='y')###
+plt.title('Prediction D4_N4', y=0.5, loc='left', color='y')
+plt.legend(bbox_to_anchor=(1, 1))
+
+# plt.plot(data_cut_non_sc.values[start:end, 4], color='k')
+# plt.title('ref', y=0.5, loc='left', color='k')
+
+plt.show()
 
 #short_idx = get_short_circuit_idx(data_cut_non_sc.rupture_5)
 #short_idx = get_short_circuit_idx(data_cut_non_sc.values[start:,5]) # index of rupture 10
